@@ -42,6 +42,8 @@ public class Matrix {
 	 *       
 	 *       IntStream.range(a, b).allMatch(i -> P(i))
 	 *       forall i. a <= i < b ==> P(i)
+	 * 
+	 * @creates | result
 	 */
 	public double[] getElementsRowMajor() { return elements.clone(); }
 	
@@ -51,6 +53,8 @@ public class Matrix {
 	 * @post | IntStream.range(0, getNbRows()).allMatch(rowIndex ->
 	 *       |     IntStream.range(0, getNbColumns()).allMatch(columnIndex ->
 	 *       |         result[columnIndex * getNbRows() + rowIndex] == getElementsRowArrays()[rowIndex][columnIndex]))
+	 * 
+	 * @creates | result
 	 */
 	public double[] getElementsColumnMajor() { 
 		double[][] rowArrays = getElementsRowArrays();
@@ -66,6 +70,8 @@ public class Matrix {
 	 * 
 	 * @post | result != null
 	 * @post | Arrays.stream(result).allMatch(row -> row != null && row.length == getNbColumns())
+	 * 
+	 * @creates | result, ...result
 	 */
 	public double[][] getElementsRowArrays() {
 		double[][] result = new double[nbRows][nbColumns];
