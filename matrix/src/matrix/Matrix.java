@@ -13,14 +13,25 @@ import java.util.stream.IntStream;
 public class Matrix {
 	
 	/**
+	 * @invar | 0 <= nbRows
+	 * @invar | 0 <= nbColumns
+	 * @invar | elements != null
+	 * @invar | elements.length == nbRows * nbColumns
+	 */
+	private int nbRows;
+	private int nbColumns;
+	/** @representationObject */
+	private double[] elements;
+	
+	/**
 	 * @post | result == getElementsRowArrays().length
 	 */
-	public int getNbRows() { throw new RuntimeException("Not yet implemented"); }
+	public int getNbRows() { return nbRows; }
 
 	/**
 	 * @basic
 	 */
-	public int getNbColumns() { throw new RuntimeException("Not yet implemented"); }
+	public int getNbColumns() { return nbColumns; }
 	
 	/**
 	 * @post | result != null
@@ -32,7 +43,7 @@ public class Matrix {
 	 *       IntStream.range(a, b).allMatch(i -> P(i))
 	 *       forall i. a <= i < b ==> P(i)
 	 */
-	public double[] getElementsRowMajor() { throw new RuntimeException("Not yet implemented"); }
+	public double[] getElementsRowMajor() { return elements.clone(); }
 	
 	/**
 	 * @post | result != null
@@ -41,16 +52,28 @@ public class Matrix {
 	 *       |     IntStream.range(0, getNbColumns()).allMatch(columnIndex ->
 	 *       |         result[columnIndex * getNbRows() + rowIndex] == getElementsRowArrays()[rowIndex][columnIndex]))
 	 */
-	public double[] getElementsColumnMajor() { throw new RuntimeException("Not yet implemented"); }
+	public double[] getElementsColumnMajor() { 
+		double[][] rowArrays = getElementsRowArrays();
+		double[] result = new double[getNbRows() * getNbColumns()];
+		for (int rowIndex = 0; rowIndex < getNbRows(); rowIndex++)
+			for (int columnIndex = 0; columnIndex < getNbColumns(); columnIndex++)
+				result[columnIndex * getNbRows() + rowIndex] = rowArrays[rowIndex][columnIndex];
+		return result;
+	}
 	
 	/**
 	 * @basic
 	 * 
 	 * @post | result != null
-	 * @post | result.length == getNbRows()
 	 * @post | Arrays.stream(result).allMatch(row -> row != null && row.length == getNbColumns())
 	 */
-	public double[][] getElementsRowArrays() { throw new RuntimeException("Not yet implemented"); }
+	public double[][] getElementsRowArrays() {
+		double[][] result = new double[nbRows][nbColumns];
+		for (int rowIndex = 0; rowIndex < nbRows; rowIndex++)
+			for (int columnIndex = 0; columnIndex < nbColumns; columnIndex++)
+				result[rowIndex][columnIndex] = elements[rowIndex * nbColumns + columnIndex];
+		return result;
+	}
 	
 	/**
 	 * Initializes this object so that it represents a matrix with the given number of rows and columns and the given elements.
@@ -78,7 +101,9 @@ public class Matrix {
 		if (elementsRowMajor.length != nbRows * nbColumns)
 			throw new IllegalArgumentException("elementsRowMajor has wrong length");
 		
-		throw new RuntimeException("Not yet implemented");
+		this.nbRows = nbRows;
+		this.nbColumns = nbColumns;
+		this.elements = elementsRowMajor.clone();
 	}
 	
 	/**
@@ -90,7 +115,12 @@ public class Matrix {
 	 * @post | IntStream.range(0, getNbRows() * getNbColumns()).allMatch(i ->
 	 *       |     result.getElementsRowMajor()[i] == getElementsRowMajor()[i] * scaleFactor)
 	 */
-	public Matrix scaled(double scaleFactor) { throw new RuntimeException("Not yet implemented"); }
+	public Matrix scaled(double scaleFactor) {
+		double[] newElements = new double[elements.length];
+		for (int i = 0; i < newElements.length; i++)
+			newElements[i] = elements[i] * scaleFactor;
+		return new Matrix(nbRows, nbColumns, newElements);
+	}
 	
 	/**
 	 * Returns the matrix obtained by adding this matrix and the given matrix.
@@ -105,6 +135,11 @@ public class Matrix {
 	 * @post | IntStream.range(0, getNbRows() * getNbColumns()).allMatch(i ->
 	 *       |     result.getElementsRowMajor()[i] == getElementsRowMajor()[i] + other.getElementsRowMajor()[i])
 	 */
-	public Matrix plus(Matrix other) { throw new RuntimeException("Not yet implemented"); }
+	public Matrix plus(Matrix other) {
+		double[] newElements = new double[elements.length];
+		for (int i = 0; i < newElements.length; i++)
+			newElements[i] = elements[i] + other.elements[i];
+		return new Matrix(nbRows, nbColumns, newElements);
+	}
 	
 }
