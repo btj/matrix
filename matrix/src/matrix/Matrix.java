@@ -20,7 +20,10 @@ public class Matrix {
 	 */
 	private int nbRows;
 	private int nbColumns;
-	/** @representationObject */
+	/**
+	 * The elements of this matrix, in row major order.
+	 * @representationObject
+	 */
 	private double[] elements;
 	
 	/**
