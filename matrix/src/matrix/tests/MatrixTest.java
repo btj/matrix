@@ -26,6 +26,12 @@ class MatrixTest {
 		
 		assertArrayEquals(new double[] {.5, 0, 0, 0, .5, 0}, myMatrix.scaled(0.5).getElementsRowMajor());
 		assertArrayEquals(new double[] {1, 0, 2, 0, 1, 2}, myMatrix.plus(new Matrix(2, 3, new double[] {0, 0, 2, 0, 0, 2})).getElementsRowMajor());
+		
+		myMatrix.scale(0.5);
+		assertArrayEquals(new double[] {.5, 0, 0, 0, .5, 0}, myMatrix.getElementsRowMajor());
+		
+		myMatrix.add(new Matrix(2, 3, new double[] {0, 0, 2, 0, 0, 2}));
+		assertArrayEquals(new double[] {.5, 0, 2, 0, .5, 2}, myMatrix.getElementsRowMajor());
 	}
 
 }

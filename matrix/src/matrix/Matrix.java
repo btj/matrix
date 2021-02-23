@@ -4,11 +4,9 @@ import java.util.Arrays;
 import java.util.stream.IntStream;
 
 /**
- * Each instance of this class represents a matrix (from algebra).
+ * Each instance of this class stores a matrix (from algebra).
  * 
  * @invar | 0 <= getNbColumns()
- * 
- * @immutable
  */
 public class Matrix {
 	
@@ -27,14 +25,27 @@ public class Matrix {
 	private double[] elements;
 	
 	/**
-	 * @post | result == getElementsRowArrays().length
+	 * @basic
+	 * 
+	 * @immutable
 	 */
 	public int getNbRows() { return nbRows; }
 
 	/**
 	 * @basic
+	 * @immutable
 	 */
 	public int getNbColumns() { return nbColumns; }
+	
+	/**
+	 * @basic
+	 * 
+	 * @pre | 0 <= rowIndex && rowIndex < getNbRows()
+	 * @pre | 0 <= columnIndex && columnIndex < getNbColumns()
+	 */
+	public double getElement(int rowIndex, int columnIndex) {
+		return elements[rowIndex * nbColumns + columnIndex];
+	}
 	
 	/**
 	 * @post | result != null
@@ -69,10 +80,12 @@ public class Matrix {
 	}
 	
 	/**
-	 * @basic
-	 * 
 	 * @post | result != null
+	 * @post | result.length == getNbRows()
 	 * @post | Arrays.stream(result).allMatch(row -> row != null && row.length == getNbColumns())
+	 * @post | IntStream.range(0, getNbRows()).allMatch(rowIndex ->
+	 *       |     IntStream.range(0, getNbColumns()).allMatch(columnIndex ->
+	 *       |         result[rowIndex][columnIndex] == getElement(rowIndex, columnIndex)))
 	 * 
 	 * @creates | result, ...result
 	 */
@@ -85,9 +98,11 @@ public class Matrix {
 	}
 	
 	/**
-	 * Initializes this object so that it represents a matrix with the given number of rows and columns and the given elements.
+	 * Initializes this object so that it stores a matrix with the given number of rows and columns and the given elements.
 	 * 
 	 * @param elementsRowMajor The elements for the array, in row major order. (I.e., the elements of the first row come first.)
+	 * 
+	 * @inspects | elementsRowMajor
 	 * 
 	 * @throws IllegalArgumentException if the given number of rows is negative
 	 *       | nbRows < 0
@@ -118,6 +133,9 @@ public class Matrix {
 	/**
 	 * Returns a copy of this matrix where each element has been multiplied by the given scale factor.
 	 * 
+	 * @inspects | this
+	 * @creates | result
+	 * 
 	 * @post | result != null
 	 * @post | result.getNbRows() == getNbRows()
 	 * @post | result.getNbColumns() == getNbColumns()
@@ -132,7 +150,22 @@ public class Matrix {
 	}
 	
 	/**
+	 * Scales this matrix by the given scale factor.
+	 * 
+	 * @post | IntStream.range(0, getNbRows() * getNbColumns()).allMatch(i ->
+	 *       |     getElementsRowMajor()[i] == old(getElementsRowMajor())[i] * scaleFactor)
+	 */
+	public void scale(double scaleFactor) {
+		for (int i = 0; i < elements.length; i++)
+			elements[i] *= scaleFactor;
+			//elements[i] = elements[i] * scaleFactor;
+	}
+	
+	/**
 	 * Returns the matrix obtained by adding this matrix and the given matrix.
+	 * 
+	 * @inspects | this, other
+	 * @creates | result
 	 * 
 	 * @pre | other != null
 	 * @pre | other.getNbRows() == getNbRows()
@@ -151,4 +184,18 @@ public class Matrix {
 		return new Matrix(nbRows, nbColumns, newElements);
 	}
 	
+	/**
+	 * Adds the given matrix to this matrix.
+	 * 
+	 * @mutates | this
+	 * @inspects | other
+	 * 
+	 * @post | IntStream.range(0, getNbRows()).allMatch(rowIndex ->
+	 *       |     IntStream.range(0, getNbColumns()).allMatch(columnIndex ->
+	 *       |         getElement(rowIndex, columnIndex) == old(getElementsRowArrays())[rowIndex][columnIndex] + other.getElement(rowIndex, columnIndex)))
+	 */
+	public void add(Matrix other) {
+		for (int i = 0; i < elements.length; i++)
+			elements[i] += other.elements[i];
+	}
 }
