@@ -21,7 +21,7 @@ public class Matrix {
 	private int nbRows;
 	private int nbColumns;
 	/**
-	 * The elements of this matrix, in row major order.
+	 * The elements of this matrix, in column major order.
 	 * @representationObject
 	 */
 	private double[] elements;
@@ -48,7 +48,14 @@ public class Matrix {
 	 * 
 	 * @creates | result
 	 */
-	public double[] getElementsRowMajor() { return elements.clone(); }
+	public double[] getElementsRowMajor() {
+		double[][] rowArrays = getElementsRowArrays();
+		double[] result = new double[getNbRows() * getNbColumns()];
+		for (int rowIndex = 0; rowIndex < getNbRows(); rowIndex++)
+			for (int columnIndex = 0; columnIndex < getNbColumns(); columnIndex++)
+				result[rowIndex * getNbColumns() + columnIndex] = rowArrays[rowIndex][columnIndex];
+		return result;
+	}
 	
 	/**
 	 * @post | result != null
@@ -60,12 +67,7 @@ public class Matrix {
 	 * @creates | result
 	 */
 	public double[] getElementsColumnMajor() { 
-		double[][] rowArrays = getElementsRowArrays();
-		double[] result = new double[getNbRows() * getNbColumns()];
-		for (int rowIndex = 0; rowIndex < getNbRows(); rowIndex++)
-			for (int columnIndex = 0; columnIndex < getNbColumns(); columnIndex++)
-				result[columnIndex * getNbRows() + rowIndex] = rowArrays[rowIndex][columnIndex];
-		return result;
+		return elements.clone();
 	}
 	
 	/**
@@ -80,7 +82,7 @@ public class Matrix {
 		double[][] result = new double[nbRows][nbColumns];
 		for (int rowIndex = 0; rowIndex < nbRows; rowIndex++)
 			for (int columnIndex = 0; columnIndex < nbColumns; columnIndex++)
-				result[rowIndex][columnIndex] = elements[rowIndex * nbColumns + columnIndex];
+				result[rowIndex][columnIndex] = elements[columnIndex * nbRows + rowIndex];
 		return result;
 	}
 	
@@ -112,7 +114,22 @@ public class Matrix {
 		
 		this.nbRows = nbRows;
 		this.nbColumns = nbColumns;
-		this.elements = elementsRowMajor.clone();
+		this.elements = new double[nbRows * nbColumns];
+		for (int rowIndex = 0; rowIndex < nbRows; rowIndex++)
+			for (int columnIndex = 0; columnIndex < nbColumns; columnIndex++)
+				elements[columnIndex * nbRows + rowIndex] = elementsRowMajor[rowIndex * nbColumns + columnIndex];
+	}
+	
+	/**
+	 * Initializes this object to represent a matrix with the given number of rows and columns
+	 * and the given elements, given in column-major order.
+	 * 
+	 * The elements are not copied!
+	 */
+	private Matrix(int nbRows, int nbColumns, double[] elementsColumnMajor, Void dummy) {
+		this.nbRows = nbRows;
+		this.nbColumns = nbColumns;
+		this.elements = elementsColumnMajor;
 	}
 	
 	/**
@@ -126,8 +143,9 @@ public class Matrix {
 	 */
 	public Matrix scaled(double scaleFactor) {
 		double[] newElements = new double[elements.length];
-		for (int i = 0; i < newElements.length; i++)
-			newElements[i] = elements[i] * scaleFactor;
+		for (int rowIndex = 0; rowIndex < nbRows; rowIndex++)
+			for (int columnIndex = 0; columnIndex < nbColumns; columnIndex++)
+				newElements[rowIndex * nbColumns + columnIndex] = elements[columnIndex * nbRows + rowIndex] * scaleFactor;
 		return new Matrix(nbRows, nbColumns, newElements);
 	}
 	
@@ -148,7 +166,7 @@ public class Matrix {
 		double[] newElements = new double[elements.length];
 		for (int i = 0; i < newElements.length; i++)
 			newElements[i] = elements[i] + other.elements[i];
-		return new Matrix(nbRows, nbColumns, newElements);
+		return new Matrix(nbRows, nbColumns, newElements, null);
 	}
 	
 }
